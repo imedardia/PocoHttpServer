@@ -19,23 +19,26 @@ class MyRequestHandler : public HTTPRequestHandler
 public:
   virtual void handleRequest(HTTPServerRequest &req, HTTPServerResponse &resp)
   {
+    ostream& out = resp.send();
+    if(req.getMethod() == string("POST")) {
+        cout << "POST METHOD not supported" << endl;
+        resp.setStatus(HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
+
+        return;
+    }
+    if(req.getMethod() == string("GET")) {
+        cout << "GET METHOD is supported" << endl;
+    }
+
     resp.setStatus(HTTPResponse::HTTP_OK);
     resp.setContentType("text/html");
 
-    ostream& out = resp.send();
     out << "<h1>Hello world!</h1>"
         << "<p>Host: "   << req.getHost()   << "</p>"
-        << "<p>Method: " << req.getMethod() << "</p>"
         << "<p>URI: "    << req.getURI()    << "</p>";
-        
     out.flush();
   }
-
-private:
-  static int count;
 };
-
-int MyRequestHandler::count = 0;
 
 class MyRequestHandlerFactory : public HTTPRequestHandlerFactory
 {
@@ -72,4 +75,3 @@ int main(int argc, char** argv)
   MyServerApp app;
   return app.run(argc, argv);
 }
-
